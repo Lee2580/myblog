@@ -88,7 +88,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Transactional
     @Override
     public void restoreOrDeleteBlog(DeleteVo deleteVo) {
-        // 修改文章逻辑删除状态
+        // 修改博客逻辑删除状态
         List<Blog> blogList = deleteVo.getIdList().stream()
                 .map(id -> Blog.builder()
                         .blogId(id)
@@ -107,13 +107,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Transactional
     @Override
     public void deleteBlogs(List<Long> blogIdList) {
-        // 删除文章标签关联
+        // 删除博客标签关联
         blogTagMapper.delete(new LambdaQueryWrapper<BlogTag>()
                 .in(BlogTag::getBlogId, blogIdList));
-        // 删除文章类型关联
+        // 删除博客类型关联
         blogCategoryMapper.delete(new LambdaQueryWrapper<BlogCategory>()
                 .in(BlogCategory::getBlogId, blogIdList));
-        // 删除文章
+        // 删除博客
         blogMapper.deleteBatchIds(blogIdList);
     }
 
@@ -146,7 +146,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 查询博客
         List<BlogDTO> blogDTOList = blogMapper.listBlogsByAdmin(PageUtil.getLimitCurrent(), PageUtil.getSize(), condition);
         //log.info("blogDTOList ==>"+blogDTOList);
-        // 查询文章点赞量和浏览量
+        // 查询博客点赞量和浏览量
         Map<Object, Double> viewsCountMap = redisService.zAllScore(BLOG_VIEWS_COUNT);
         //log.info("viewsCountMap ===>"+viewsCountMap);
         Map<String, Object> likeCountMap = redisService.hGetAll(BLOG_LIKE_COUNT);
@@ -171,11 +171,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public BlogVo getBlogById(Long blogId) {
 
-        // 查询文章信息
+        // 查询博客信息
         Blog blog = blogMapper.selectById(blogId);
-        // 查询文章分类
+        // 查询博客分类
         String categoryName = categoryMapper.CategoryNameByBlogId(blogId);
-        // 查询文章标签
+        // 查询博客标签
         List<String> tagNameList = tagMapper.listTagNameByBlogId(blogId);
         // 封装数据
         BlogVo blogVo = BeanUtil.copyProperties(blog, BlogVo.class);
@@ -191,19 +191,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Transactional
     @Override
     public void saveOrUpdateBlog(BlogVo blogVo) {
-        // 保存文章分类
-        Category category = saveBlogCategory(blogVo);
-        // 保存或修改文章
+
+        // 保存或修改博客
         Blog blog = BeanUtil.copyProperties(blogVo, Blog.class);
-        if (Objects.nonNull(category)) {
-            BlogCategory blogCategory = BlogCategory.builder().categoryId(category.getCategoryId())
-                    .blogId(blog.getBlogId()).build();
-            blogCategoryMapper.insert(blogCategory);
-        }
         blog.setUserId(UserUtil.getLoginUser().getUserId());
         //log.info("blog ==>"+blog);
-
         blogService.saveOrUpdate(blog);
+        // 保存博客分类
+        saveBlogCategory(blogVo, blog.getBlogId());
         // 保存博客标签
         saveBlogTag(blogVo, blog.getBlogId());
     }
@@ -230,14 +225,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                             .last("limit 5"));
                     return BeanCopyUtil.copyList(blogList, BlogRecommendDTO.class);
                 });
-        // 查询id对应文章
+        // 查询id对应博客
         BlogInfoDTO blog = blogMapper.getBlogById(blogId);
         if (Objects.isNull(blog)) {
-            throw new BizException("文章不存在");
+            throw new BizException("博客不存在");
         }
         // 更新博客浏览量
         updateBlogViewsCount(blogId);
-        // 查询上一篇下一篇文章
+        // 查询上一篇下一篇博客
         Blog lastBlog = blogMapper.selectOne(new LambdaQueryWrapper<Blog>()
                 .select(Blog::getBlogId, Blog::getTitle, Blog::getFirstPicture)
                 .eq(Blog::getIsDelete, FALSE)
@@ -263,7 +258,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         }
         blog.setLikeCount((Integer) redisService.hGet(BLOG_LIKE_COUNT, blogId.toString()));
 
-        // 封装文章信息
+        // 封装博客信息
         try {
             blog.setRecommendBlogList(recommendBlogList.get());
             blog.setNewBlogList(newBlogList.get());
@@ -305,14 +300,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         // 判断是否点赞
         String blogLikeKey = BLOG_USER_LIKE + UserUtil.getLoginUser().getUserId();
         if (redisService.sIsMember(blogLikeKey, blogId)) {
-            // 点过赞则删除文章id
+            // 点过赞则删除博客id
             redisService.sRemove(blogLikeKey, blogId);
-            // 文章点赞量-1
+            // 博客点赞量-1
             redisService.hDecr(BLOG_LIKE_COUNT, blogId.toString(), 1L);
         } else {
-            // 未点赞则增加文章id
+            // 未点赞则增加博客id
             redisService.sAdd(blogLikeKey, blogId);
-            // 文章点赞量+1
+            // 博客点赞量+1
             redisService.hIncr(BLOG_LIKE_COUNT, blogId.toString(), 1L);
         }
     }
@@ -342,7 +337,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public BlogPreviewListDTO listBlogByCondition(ConditionVo condition) {
 
-        // 搜索文章
+        // 搜索博客
         List<BlogPreviewDTO> blogPreviewDTOList = blogMapper.listArticlesByCondition(
                 PageUtil.getLimitCurrent(), PageUtil.getSize(), condition);
 
@@ -393,18 +388,29 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @param blogVo
      * @return
      */
-    private Category saveBlogCategory(BlogVo blogVo) {
-
+    private void saveBlogCategory(BlogVo blogVo, Long blogId) {
+        // 编辑博客则删除博客分类
+        if (Objects.nonNull(blogVo.getBlogId())) {
+            blogCategoryMapper.delete(new LambdaQueryWrapper<BlogCategory>()
+                    .eq(BlogCategory::getBlogId, blogVo.getBlogId()));
+        }
         // 判断分类是否存在
         Category category = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
                 .eq(Category::getCategoryName, blogVo.getCategoryName()));
+        // 不存在添加分类
         if (Objects.isNull(category) && !blogVo.getStatus().equals(DRAFT.getStatus())) {
             category = Category.builder()
                     .categoryName(blogVo.getCategoryName())
                     .build();
             categoryMapper.insert(category);
         }
-        return category;
+        // 绑定博客分类
+        if (Objects.nonNull(category)) {
+            BlogCategory blogCategory = BlogCategory.builder()
+                    .categoryId(category.getCategoryId())
+                    .blogId(blogId).build();
+            blogCategoryMapper.insert(blogCategory);
+        }
     }
 
     /**
@@ -413,12 +419,12 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
      * @param blogId
      */
     private void saveBlogTag(BlogVo blogVo, Long blogId) {
-        // 编辑文章则删除文章所有标签
+        // 编辑博客则删除博客所有标签
         if (Objects.nonNull(blogVo.getBlogId())) {
             blogTagMapper.delete(new LambdaQueryWrapper<BlogTag>()
                     .eq(BlogTag::getBlogId, blogVo.getBlogId()));
         }
-        // 添加文章标签
+        // 添加博客标签
         List<String> tagNameList = blogVo.getTagNameList();
         if (CollectionUtils.isNotEmpty(tagNameList)) {
             // 查询已存在的标签
@@ -443,7 +449,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                         .collect(Collectors.toList());
                 existTagIdList.addAll(tagIdList);
             }
-            // 提取标签id绑定文章
+            // 提取标签id绑定博客
             List<BlogTag> blogTagList = existTagIdList.stream().map(item ->
                     BlogTag.builder()
                     .blogId(blogId)
