@@ -63,9 +63,9 @@ public class Const {
     public static String COMPONENT = "Layout";
 
     /**
-     * 文章页面路径
+     * 博客页面路径
      */
-    public static final String ARTICLE_PATH = "/articles/";
+    public static final String BLOG_PATH = "/blogs/";
 
     /**
      * 友联页面路径

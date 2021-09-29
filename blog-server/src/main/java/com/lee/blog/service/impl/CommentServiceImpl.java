@@ -131,7 +131,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
         // 判断是否开启邮箱通知,通知用户
         if (websiteConfig.getIsEmailNotice().equals(TRUE)) {
-            //notice(comment);
+            notice(comment);
         }
     }
 
@@ -185,7 +185,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public PageResult<CommentDTO> listComments(Long blogId) {
 
-        // 查询文章评论量
+        // 查询博客评论量
         Integer commentCount = commentMapper.selectCount(new LambdaQueryWrapper<Comment>()
                 .eq(Objects.nonNull(blogId), Comment::getBlogId, blogId)
                 .isNull(Objects.isNull(blogId), Comment::getBlogId)
@@ -194,7 +194,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (commentCount == 0) {
             return new PageResult<>();
         }
-        //log.info("文章评论量 ===>"+commentCount);
+        //log.info("博客评论量 ===>"+commentCount);
         // 分页查询评论集合
         List<CommentDTO> commentDTOList = commentMapper.listComments(
                 PageUtil.getLimitCurrent(), PageUtil.getSize(), blogId);
@@ -250,7 +250,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 emailDTO.setEmail(email);
                 emailDTO.setSubject("评论提醒");
                 // 判断页面路径
-                String url = Objects.nonNull(comment.getBlogId()) ? websiteUrl + ARTICLE_PATH + comment.getBlogId() : websiteUrl + LINK_PATH;
+                String url = Objects.nonNull(comment.getBlogId()) ? websiteUrl + BLOG_PATH + comment.getBlogId() : websiteUrl + LINK_PATH;
                 emailDTO.setContent("您收到了一条新的回复，请前往" + url + "\n页面查看");
             } else {
                 // 管理员审核提醒

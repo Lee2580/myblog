@@ -21,7 +21,7 @@ public class CommentVo {
     /**
      * 评论博客id
      */
-    @ApiModelProperty(name = "blogId", value = "文章id", dataType = "Long")
+    @ApiModelProperty(name = "blogId", value = "博客id", dataType = "Long")
     private Long blogId;
 
     /**

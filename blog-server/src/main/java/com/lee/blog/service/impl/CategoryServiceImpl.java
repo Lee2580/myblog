@@ -78,11 +78,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      */
     @Override
     public void deleteCategories(List<Long> categoryIdList) {
-        // 查询分类id下是否有文章
+        // 查询分类id下是否有博客
         Integer count = blogCategoryMapper.selectCount(new LambdaQueryWrapper<BlogCategory>()
                 .in(BlogCategory::getCategoryId, categoryIdList));
         if (count > 0) {
-            throw new BizException("删除失败，该分类下存在文章");
+            throw new BizException("删除失败，该分类下存在博客");
         }
         categoryMapper.deleteBatchIds(categoryIdList);
     }

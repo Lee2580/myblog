@@ -83,11 +83,11 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
      */
     @Override
     public void deleteTag(List<Long> tagIdList) {
-        // 查询标签下是否有文章
+        // 查询标签下是否有博客
         Integer count = blogTagMapper.selectCount(new LambdaQueryWrapper<BlogTag>()
                 .in(BlogTag::getTagId, tagIdList));
         if (count > 0) {
-            throw new BizException("删除失败，该标签下存在文章");
+            throw new BizException("删除失败，该标签下存在博客");
         }
         tagMapper.deleteBatchIds(tagIdList);
     }

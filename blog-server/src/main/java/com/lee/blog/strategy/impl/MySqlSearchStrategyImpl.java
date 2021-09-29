@@ -58,7 +58,7 @@ public class MySqlSearchStrategyImpl implements SearchStrategy {
                 int postLength = item.getContent().length() - last;
                 int postIndex = postLength > 175 ? last + 175 : last + postLength;
                 String postText = item.getContent().substring(index, postIndex);
-                // 文章内容高亮
+                // 博客内容高亮
                 blogContent = (preText + postText).replaceAll(keywords, PRE_TAG + keywords + POST_TAG);
             } else {
                 blogContent = item.getContent();

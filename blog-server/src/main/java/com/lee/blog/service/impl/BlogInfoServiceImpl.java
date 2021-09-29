@@ -87,7 +87,7 @@ public class BlogInfoServiceImpl implements BlogInfoService {
         Integer messageCount = messageMapper.selectCount(null);
         // 查询用户量
         Integer userCount = userMapper.selectCount(null);
-        // 查询文章量
+        // 查询博客量
         Integer blogCount = blogMapper.selectCount(new LambdaQueryWrapper<Blog>()
                 .eq(Blog::getIsDelete, FALSE));
         // 查询一周用户访问量
@@ -98,10 +98,10 @@ public class BlogInfoServiceImpl implements BlogInfoService {
         List<CategoryDTO> categoryDTOList = categoryMapper.listCategoryDTO();
         // 查询标签数据
         List<TagDTO> tagDTOList = BeanCopyUtil.copyList(tagMapper.selectList(null), TagDTO.class);
-        // 查询redis访问量前五的文章
+        // 查询redis访问量前五的博客
         Map<Object, Double> blogMap = redisService.zReverseRangeWithScore(BLOG_VIEWS_COUNT, 0, 4);
         //log.info("blogMap ===>"+blogMap);
-        // 文章为空直接返回
+        // 博客为空直接返回
         if (CollectionUtils.isEmpty(blogMap)) {
             return BlogAdminInfoDTO.builder()
                     .blogStatisticsList(blogStatisticsDTOList)

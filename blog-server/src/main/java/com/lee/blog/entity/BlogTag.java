@@ -27,7 +27,7 @@ public class BlogTag implements Serializable {
     private Long id;
 
     /**
-     * 文章id
+     * 博客id
      */
     private Long blogId;
 

@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 public class BlogHomeInfoDTO {
     /**
-     * 文章数量
+     * 博客数量
      */
     private Integer blogCount;
 

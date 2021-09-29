@@ -17,7 +17,7 @@ public enum FilePathEnum {
      */
     AVATAR("avatar/", "头像路径"),
     /**
-     * 文章图片路径
+     * 博客图片路径
      */
     BLOG("blogs/", "博客图片路径"),
     /**

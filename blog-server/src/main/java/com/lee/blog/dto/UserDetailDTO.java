@@ -87,7 +87,7 @@ public class UserDetailDTO implements UserDetails {
     private String ipSource;
 
     /**
-     * 点赞文章集合
+     * 点赞博客集合
      */
     private Set<Object> blogLikeSet;
 

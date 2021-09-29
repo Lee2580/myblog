@@ -34,17 +34,17 @@ public class BlogPreviewDTO {
     private Date createTime;
 
     /**
-     * 文章分类id
+     * 博客分类id
      */
     private Long categoryId;
 
     /**
-     * 文章分类名
+     * 博客分类名
      */
     private String categoryName;
 
     /**
-     * 文章标签
+     * 博客标签
      */
     private List<TagDTO> tagDTOList;
 }

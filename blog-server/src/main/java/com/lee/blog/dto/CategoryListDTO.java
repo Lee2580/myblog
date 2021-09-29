@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class CategoryListDTO extends CategoryDTO{
 
     /**
-     * 文章数量
+     * 博客数量
      */
     private Integer blogCount;
 

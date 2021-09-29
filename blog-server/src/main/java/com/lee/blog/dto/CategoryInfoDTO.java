@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class CategoryInfoDTO extends CategoryDTO{
     /**
-     * 分类下的文章数量
+     * 分类下的博客数量
      */
     private Integer blogCount;
 }

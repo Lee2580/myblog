@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 文章浏览量排行
+ * 博客浏览量排行
  * @author lee
  * @create 2021-09-17 11:09
  **/

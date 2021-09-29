@@ -94,7 +94,7 @@ public class BlogInfoDTO {
     private List<BlogRecommendDTO> recommendBlogList;
 
     /**
-     * 最新文章列表
+     * 最新博客列表
      */
     private List<BlogRecommendDTO> newBlogList;
 }

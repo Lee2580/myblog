@@ -14,7 +14,7 @@ import java.util.Set;
 public class UserDTO extends User {
 
     /**
-     * 点赞文章集合
+     * 点赞博客集合
      */
     private Set<Object> blogLikeSet;
 

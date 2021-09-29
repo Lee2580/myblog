@@ -44,7 +44,7 @@ public class HomeBlogDTO {
     private Integer recommend;
 
     /**
-     * 文章类型
+     * 博客类型
      */
     private Integer blogType;
 
@@ -54,12 +54,12 @@ public class HomeBlogDTO {
     private Long categoryId;
 
     /**
-     * 文章分类名
+     * 博客分类名
      */
     private String categoryName;
 
     /**
-     * 文章标签
+     * 博客标签
      */
     private List<TagDTO> tagDTOList;
 }
