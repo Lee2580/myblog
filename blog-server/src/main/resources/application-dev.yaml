@@ -1,0 +1,18 @@
+# 生产环境
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.79.10:3306/lee_blog?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username:
+    password:
+  # redis配置
+  redis:
+    host: 192.168.79.10
+    port: 6379
+    password:
+  # rabbitmq配置
+  rabbitmq:
+    host: 192.168.79.10
+    port: 5672
+    username:
+    password:
