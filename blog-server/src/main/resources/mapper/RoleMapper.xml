@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.blog.mapper.RoleMapper">
+
+    <resultMap id="RoleMap" type="com.lee.blog.dto.RoleDTO">
+        <id column="role_id" property="roleId"/>
+        <result column="name" property="name"/>
+        <result column="label" property="label"/>
+        <result column="create_time" property="createTime"/>
+        <result column="status" property="status"/>
+        <collection property="resourceIdList" ofType="java.lang.Long">
+            <constructor>
+                <arg column="resource_id"/>
+            </constructor>
+        </collection>
+        <collection property="menuIdList" ofType="java.lang.Long">
+            <constructor>
+                <arg column="menu_id"/>
+            </constructor>
+        </collection>
+    </resultMap>
+
+    <resultMap id="RolePermissionMap" type="com.lee.blog.dto.ResourceRoleDTO">
+        <id column="id" property="id"/>
+        <result column="url" property="url"/>
+        <result column="request_method" property="requestMethod"/>
+        <collection property="roleList" ofType="java.lang.String">
+            <constructor>
+                <arg column="label"/>
+            </constructor>
+        </collection>
+    </resultMap>
+
+    <select id="listRolesByUserId" resultType="java.lang.String">
+        select label from `role`,user_role
+        where `role`.role_id = user_role.role_id
+        and user_role.user_id = #{userId}
+    </select>
+
+    <!--limit 分页查询-->
+    <select id="listRoles" resultMap="RoleMap">
+        SELECT
+            r.role_id,r.name,r.label,r.create_time,r.status,rr.resource_id,rm.menu_id
+        FROM
+        (
+            SELECT
+                `role_id`,`name`,`label`,`create_time`,`status`
+            FROM
+                `role`
+            <where>
+                <if test="conditionVo.keywords != null ">
+                    role_name like concat('%',#{conditionVo.keywords},'%')
+                </if>
+            </where>
+                limit #{limitCurrent}, #{size}
+        ) r
+        LEFT JOIN
+            role_resource rr ON r.role_id = rr.role_id
+        LEFT JOIN
+            role_menu rm on r.role_id = rm.role_id
+        ORDER BY
+            r.role_id
+    </select>
+
+    <select id="listResourceRoles" resultMap="RolePermissionMap">
+        SELECT
+            re.resource_id,re.url,re.request_method,r.label
+        FROM
+            resource re
+                LEFT JOIN role_resource rep on re.resource_id = rep.resource_id
+                LEFT JOIN `role` r on rep.role_id = r.role_id
+        WHERE
+            parent_id is NOT NULL
+        AND
+            anonymous = 0
+    </select>
+</mapper>

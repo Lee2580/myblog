@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.blog.mapper.CommentMapper">
+
+    <select id="countComment" resultType="java.lang.Integer">
+        SELECT
+            count(1)
+        from
+            comment c
+        LEFT JOIN `user` u ON c.user_id = u.user_id
+        <where>
+            <if test="condition.type != null and condition.type == 1">
+                c.blog_id IS NOT NULL
+            </if>
+            <if test="condition.type != null and condition.type == 2">
+                c.blog_id IS NULL
+            </if>
+            <if test="condition.isReview != null">
+                c.is_review = #{condition.isReview}
+            </if>
+            <if test="condition.keywords != null">
+                and u.nickname like concat('%',#{condition.keywords},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getCommentListDTO" resultType="com.lee.blog.dto.CommentListDTO">
+        SELECT
+            c.comment_id,u.avatar,u.nickname,r.nickname AS reply_nickname,b.title,
+            c.comment_content,c.create_time,c.is_review
+        FROM
+            comment c
+        LEFT JOIN blog b ON c.blog_id = b.blog_id
+        LEFT JOIN `user` u ON c.user_id = u.user_id
+        LEFT JOIN `user` r ON c.reply_user_id = r.user_id
+        <where>
+            <if test="condition.type != null and condition.type == 1">
+                c.blog_id IS NOT NULL
+            </if>
+            <if test="condition.type != null and condition.type == 2">
+                c.blog_id IS NULL
+            </if>
+            <if test="condition.isReview != null">
+                c.is_review = #{condition.isReview}
+            </if>
+            <if test="condition.keywords != null">
+                and u.nickname like concat('%',#{condition.keywords},'%')
+            </if>
+        </where>
+        ORDER BY
+            comment_id DESC
+        LIMIT #{limitCurrent},#{size}
+    </select>
+
+    <select id="listRepliesByCommentId" resultType="com.lee.blog.dto.ReplyDTO">
+        SELECT
+            c.user_id,u.nickname,u.avatar,u.web_site,c.reply_user_id,
+            r.nickname as reply_nickname,r.web_site as reply_web_site,
+            c.comment_id,c.parent_comment_id,c.comment_content,c.create_time
+        FROM
+            comment c
+                JOIN `user` u ON c.user_id = u.user_id
+                JOIN `user` r ON c.reply_user_id = r.user_id
+        WHERE
+            c.is_review = 1
+          AND
+            parent_comment_id =#{commentId}
+        ORDER BY
+            c.comment_id ASC
+        LIMIT #{limitCurrent}, #{size}
+    </select>
+
+    <select id="listComments" resultType="com.lee.blog.dto.CommentDTO">
+        SELECT
+            u.nickname,u.avatar,u.web_site,c.user_id,c.comment_id,
+            c.comment_content,c.create_time
+        FROM
+            comment c
+        JOIN `user` u ON c.user_id = u.user_id
+        WHERE
+            <if test="blogId != null">
+                c.blog_id = #{blogId}
+            </if>
+            <if test="blogId == null">
+                c.blog_id IS NULL
+            </if>
+            AND c.is_review = 1
+            AND parent_comment_id IS NULL
+        ORDER BY
+            c.comment_id DESC
+        LIMIT #{limitCurrent},#{size}
+    </select>
+
+    <!-- 窗口函数 row_number() over(partition by parent_comment_id order by create_time ASC) row_num -->
+    <select id="listReplies" resultType="com.lee.blog.dto.ReplyDTO">
+        SELECT
+            *
+        FROM
+        (
+            SELECT
+                c.user_id,u.nickname,u.avatar,u.web_site,c.reply_user_id,
+                r.nickname AS reply_nickname,r.web_site AS reply_web_site,
+                c.comment_id,c.comment_content,c.create_time,
+                IF ( @p = parent_comment_id, @rownum := @rownum + 1, @rownum := 1 ) row_num,
+                @p := parent_comment_id parent_comment_id
+            FROM
+                ( SELECT @p := NULL, @rownum := 0 ) rownum,
+                comment c
+            JOIN `user` u ON c.user_id = u.user_id
+            JOIN `user` r ON c.reply_user_id = r.user_id
+            WHERE
+                c.is_review = 1
+                AND
+                parent_comment_id IN
+                (
+                    <foreach collection="commentIdList" item="commentId" separator=",">
+                        #{commentId}
+                    </foreach>
+                )
+            ORDER BY
+                parent_comment_id,create_time ASC
+        ) t
+        WHERE
+            4 > row_num
+    </select>
+
+    <select id="listReplyCountByCommentId" resultType="com.lee.blog.dto.ReplyCountDTO">
+        SELECT
+            parent_comment_id as comment_id,
+            count(1) AS reply_count
+        FROM
+            comment
+        WHERE
+            is_review = 1
+        AND
+            parent_comment_id IN
+            (
+                <foreach collection="commentIdList" item="commentId" separator=",">
+                    #{commentId}
+                </foreach>
+            )
+        GROUP BY
+            parent_comment_id
+    </select>
+</mapper>

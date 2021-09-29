@@ -10,7 +10,26 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>blog</module>
+        <module>blog-common</module>
+        <module>blog-server</module>
     </modules>
+
+    <!--版本管理-->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <lombok.version>1.18.20</lombok.version>
+        <mybatis-plus.version>3.4.3</mybatis-plus.version>
+    </properties>
+
+    <!--统一依赖管理-->
+    <dependencyManagement>
+        <dependencies>
+
+        </dependencies>
+    </dependencyManagement>
 
 </project>

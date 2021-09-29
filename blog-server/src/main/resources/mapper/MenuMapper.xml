@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.blog.mapper.MenuMapper">
+
+    <!--distinct 结果集去重-->
+    <select id="listMenusByUserId" resultType="com.lee.blog.entity.Menu">
+        select distinct
+            m.menu_id,`name`,`path`,`component`,`icon`,`status`,`parent_id`,
+            `order_num`,`type`
+        from
+            user_role ur
+        join
+            role_menu rm on rm.role_id = ur.role_id
+        join
+            menu m on rm.menu_id = m.menu_id
+        where
+            user_id = #{userId}
+    </select>
+
+</mapper>

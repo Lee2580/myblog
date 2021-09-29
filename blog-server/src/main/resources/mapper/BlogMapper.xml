@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.blog.mapper.BlogMapper">
+
+    <resultMap id="blogsByAdminResultMap" type="com.lee.blog.dto.BlogDTO">
+        <id column="blog_id" property="blogId"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="title" property="title"/>
+        <result column="create_time" property="createTime"/>
+        <result column="blog_type" property="blogType"/>
+        <result column="recommend" property="recommend"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="status" property="status"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <collection property="tagDTOList" ofType="com.lee.blog.dto.TagDTO">
+            <id column="tag_id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="blogResultMap" type="com.lee.blog.dto.BlogInfoDTO">
+        <id column="blog_id" property="blogId"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="blog_type" property="blogType"/>
+        <result column="original_url" property="originalUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <collection property="tagDTOList" ofType="com.lee.blog.dto.TagDTO">
+            <id column="tag_id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="homeBlogResultMap" type="com.lee.blog.dto.HomeBlogDTO">
+        <id column="blog_id" property="blogId"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <result column="blog_type" property="blogType"/>
+        <result column="recommend" property="recommend"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <collection property="tagDTOList" ofType="com.lee.blog.dto.TagDTO">
+            <id column="tag_id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="blogPreviewResultMap" type="com.lee.blog.dto.BlogPreviewDTO">
+        <id column="blog_id" property="blogId"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="title" property="title"/>
+        <result column="create_time" property="createTime"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="category_name" property="categoryName"/>
+        <collection property="tagDTOList" ofType="com.lee.blog.dto.TagDTO">
+            <id column="tag_id" property="tagId"/>
+            <result column="tag_name" property="tagName"/>
+        </collection>
+    </resultMap>
+
+    <select id="countBlogs" resultType="java.lang.Integer">
+        SELECT
+            count(DISTINCT b.blog_id)
+        from
+            blog b
+        LEFT JOIN blog_tag bt on  b.blog_id = bt.blog_id
+        LEFT JOIN blog_category bc on  b.blog_id = bc.blog_id
+        <where>
+            is_delete = #{condition.isDelete}
+            <if test="condition.keywords != null">
+                and title like concat('%',#{condition.keywords},'%')
+            </if>
+            <if test="condition.status != null">
+                and `status` = #{condition.status}
+            </if>
+            <if test="condition.categoryId != null">
+                and bty.type_id = #{condition.categoryId}
+            </if>
+            <if test="condition.blogType != null">
+                and blog_type = #{condition.blogType}
+            </if>
+            <if test="condition.tagId != null">
+                and bt.tag_id = #{condition.tagId}
+            </if>
+        </where>
+    </select>
+
+    <select id="listBlogsByAdmin" resultMap="blogsByAdminResultMap">
+        SELECT
+            b.blog_id,b.first_picture,b.title,b.blog_type,b.recommend,b.is_delete,b.status,
+            b.create_time,category.category_id,category.category_name,tag.tag_id,tag.tag_name
+        FROM
+        (
+            SELECT
+                blog_id,first_picture,title,blog_type,recommend,is_delete,status,
+                create_time
+            FROM
+                blog
+            <where>
+                is_delete = #{condition.isDelete}
+                <if test="condition.keywords != null">
+                    and title like concat('%',#{condition.keywords},'%')
+                </if>
+                <if test="condition.status != null">
+                    and status = #{condition.status}
+                </if>
+                <if test="condition.blogType != null">
+                    and blog_type = #{condition.blogType}
+                </if>
+                <if test="condition.categoryId != null">
+                    and blog_id in
+                    (
+                        SELECT
+                            blog_id
+                        FROM
+                            blog_category
+                        WHERE
+                            category_id = #{condition.categoryId}
+                    )
+                </if>
+                <if test="condition.tagId != null">
+                    and blog_id in
+                    (
+                        SELECT
+                            blog_id
+                        FROM
+                            blog_tag
+                        WHERE
+                            tag_id = #{condition.tagId}
+                    )
+                </if>
+            </where>
+            ORDER BY
+                recommend DESC,blog_id DESC
+            LIMIT #{limitCurrent},#{size}
+        ) b
+        LEFT JOIN blog_category bc ON b.blog_id = bc.blog_id
+        LEFT JOIN category ON category.category_id = bc.category_id
+        LEFT JOIN blog_tag bt ON b.blog_id = bt.blog_id
+        LEFT JOIN tag ON tag.tag_id = bt.tag_id
+        ORDER BY
+            recommend DESC,b.blog_id DESC
+    </select>
+
+    <select id="listBlogStatistics" resultType="com.lee.blog.dto.BlogStatisticsDTO">
+        SELECT
+            DATE_FORMAT( create_time, "%Y-%m-%d" ) AS `date`,
+            COUNT( 1 ) AS `count`
+        FROM
+            blog
+        GROUP BY
+            `date`
+        ORDER BY
+            `date` DESC
+    </select>
+
+    <select id="listRecommendBlog" resultType="com.lee.blog.dto.BlogRecommendDTO">
+        SELECT
+            b.blog_id,b.title,b.first_picture,b.create_time
+        FROM
+            (
+                SELECT DISTINCT
+                    t1.blog_id
+                FROM
+                        ( SELECT tag_id FROM blog_tag WHERE blog_id = #{blogId} ) t
+                        JOIN blog_tag t1 ON t.tag_id = t1.tag_id
+                WHERE
+                    t1.blog_id != #{blogId}
+            ) t2
+            JOIN blog b ON t2.blog_id = b.blog_id
+        WHERE b.is_delete = 0
+        ORDER BY
+            b.status DESC,b.blog_id DESC
+        LIMIT 6
+    </select>
+
+    <select id="getBlogById" resultMap="blogResultMap">
+        SELECT
+            b.blog_id,b.first_picture,b.title,b.content,b.blog_type,
+            b.original_url,b.create_time,b.update_time,c.category_id,
+            c.category_name,t.tag_id,t.tag_name
+        FROM
+            blog b
+                JOIN blog_category bc ON b.blog_id = bc.blog_id
+                JOIN category c ON bc.category_id = c.category_id
+                JOIN blog_tag bt ON b.blog_id = bt.blog_id
+                JOIN tag t ON t.tag_id = bt.tag_id
+        WHERE
+            b.blog_id = #{blogId}
+            AND b.is_delete = 0
+            AND b.status = 1
+    </select>
+
+    <select id="listHomeBlog" resultMap="homeBlogResultMap">
+        SELECT
+            b.blog_id,b.first_picture,b.title,SUBSTR( b.content, 1, 500 ) AS content,
+            b.create_time,b.blog_type,b.recommend,c.category_id,c.category_name,
+            t.tag_id,t.tag_name
+        FROM
+            (
+                SELECT
+                    blog_id,first_picture,title,content,blog_type,recommend,
+                    create_time
+                FROM
+                    blog
+                WHERE is_delete = 0
+                  AND status = 1
+                ORDER BY
+                    recommend DESC,blog_id DESC
+                LIMIT #{limitCurrent} , #{size}
+            ) b
+                JOIN blog_category bc ON b.blog_id = bc.blog_id
+                JOIN category c ON bc.category_id = c.category_id
+                JOIN blog_tag bt ON b.blog_id = bt.blog_id
+                JOIN tag t ON t.tag_id = bt.tag_id
+        ORDER BY
+            b.recommend DESC,
+            b.blog_id DESC
+    </select>
+
+    <select id="listArticlesByCondition" resultMap="blogPreviewResultMap">
+        SELECT
+            b.blog_id,b.first_picture,b.title,b.create_time,c.category_id,
+            c.category_name,t.tag_id,t.tag_name
+        FROM
+        (
+            SELECT
+                blog_id,first_picture,title,content,create_time
+            FROM
+                blog
+            <where>
+                <if test="condition.categoryId != null">
+                    blog_id IN (
+                        SELECT
+                            blog_id
+                        FROM
+                            blog_category
+                        WHERE
+                            category_id = #{condition.categoryId})
+                </if>
+                <if test="condition.tagId != null">
+                    blog_id IN (
+                        SELECT
+                            blog_id
+                        FROM
+                            blog_tag
+                        WHERE
+                            tag_id = #{condition.tagId})
+                </if>
+            </where>
+            AND is_delete = 0
+            AND status = 1
+            ORDER BY blog_id DESC
+            LIMIT #{limitCurrent},#{size}
+        ) b
+        JOIN blog_category bc ON b.blog_id = bc.blog_id
+        JOIN category c ON bc.category_id = c.category_id
+        JOIN blog_tag bt ON b.blog_id = bt.blog_id
+        JOIN tag t ON t.tag_id = bt.tag_id
+    </select>
+
+</mapper>
