@@ -15,7 +15,7 @@ public class ArchiveDTO {
     /**
      * id
      */
-    private Long BlogId;
+    private Long blogId;
 
     /**
      * 标题

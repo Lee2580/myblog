@@ -320,13 +320,13 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     public PageResult<ArchiveDTO> listArchives() {
         Page<Blog> page = new Page<>(PageUtil.getCurrent(), PageUtil.getSize());
         // 获取分页数据
-        Page<Blog> articlePage = blogMapper.selectPage(page, new LambdaQueryWrapper<Blog>()
+        Page<Blog> blogPage = blogMapper.selectPage(page, new LambdaQueryWrapper<Blog>()
                 .select(Blog::getBlogId, Blog::getTitle, Blog::getCreateTime)
                 .orderByDesc(Blog::getCreateTime)
                 .eq(Blog::getIsDelete, FALSE)
                 .eq(Blog::getStatus, PUBLIC.getStatus()));
-        List<ArchiveDTO> archiveDTOList = BeanCopyUtil.copyList(articlePage.getRecords(), ArchiveDTO.class);
-        return new PageResult<>(archiveDTOList, (int) articlePage.getTotal());
+        List<ArchiveDTO> archiveDTOList = BeanCopyUtil.copyList(blogPage.getRecords(), ArchiveDTO.class);
+        return new PageResult<>(archiveDTOList, (int) blogPage.getTotal());
     }
 
     /**

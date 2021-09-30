@@ -34,7 +34,7 @@ import static com.lee.common.comstant.MQConst.EMAIL_EXCHANGE;
 import static com.lee.common.comstant.RedisConst.COMMENT_LIKE_COUNT;
 import static com.lee.common.comstant.RedisConst.COMMENT_USER_LIKE;
 import static com.lee.common.comstant.Const.*;
-
+import static com.lee.common.comstant.Const.BLOG_PATH;
 /**
  * <p>
  *  服务实现类
