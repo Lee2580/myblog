@@ -3,6 +3,10 @@ server:
   servlet:
     session:
       timeout: 21600
+      
+  # 默认是8KB
+  max-http-header-size: 16384
+  
 spring:
   profiles:
     active: prod
