@@ -1,5 +1,6 @@
 package com.lee.blog.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
  * @author lee
  * @create 2021-09-14 19:22
  **/
+@Slf4j
 @Component
 public class AccessDecisionManagerImpl implements AccessDecisionManager {
     @Override
@@ -26,6 +28,8 @@ public class AccessDecisionManagerImpl implements AccessDecisionManager {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
+        //log.info("用户权限列表==》"+permissionList);
+        //log.info("collection==>"+collection);
         for (ConfigAttribute item : collection) {
             if (permissionList.contains(item.getAttribute())) {
                 return;

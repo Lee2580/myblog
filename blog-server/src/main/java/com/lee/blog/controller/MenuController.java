@@ -11,6 +11,7 @@ import com.lee.blog.vo.StatusVo;
 import com.lee.common.Result.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ import static com.lee.common.comstant.OptTypeConst.*;
  * @since 2021-09-11
  */
 @Api(tags = "菜单管理模块")
+@Slf4j
 @RestController
 public class MenuController {
 

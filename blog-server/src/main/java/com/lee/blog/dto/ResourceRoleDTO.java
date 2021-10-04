@@ -15,7 +15,7 @@ public class ResourceRoleDTO {
     /**
      * 资源id
      */
-    private Long id;
+    private Long resourceId;
 
     /**
      * 路径

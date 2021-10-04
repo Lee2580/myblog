@@ -3,6 +3,7 @@ package com.lee.blog.security;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.lee.blog.dto.ResourceRoleDTO;
 import com.lee.blog.mapper.RoleMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -20,6 +21,7 @@ import java.util.List;
  * @author lee
  * @create 2021-09-14 19:15
  **/
+@Slf4j
 @Component
 public class FilterInvocationSecurityMetadataSourceImpl implements FilterInvocationSecurityMetadataSource {
 
@@ -59,11 +61,12 @@ public class FilterInvocationSecurityMetadataSourceImpl implements FilterInvocat
         // 获取用户请求Url
         String url = fi.getRequest().getRequestURI();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-
+        //log.info("resourceRoleList ==>"+resourceRoleList);
         // 获取接口角色信息，若为匿名接口则放行，若无对应角色则禁止
         for (ResourceRoleDTO resourceRoleDTO : resourceRoleList) {
             if (antPathMatcher.match(resourceRoleDTO.getUrl(), url) && resourceRoleDTO.getRequestMethod().equals(method)) {
                 List<String> roleList = resourceRoleDTO.getRoleList();
+                //log.info("roleList ==>"+roleList);
                 if (CollectionUtils.isEmpty(roleList)) {
                     return SecurityConfig.createList("disable");
                 }

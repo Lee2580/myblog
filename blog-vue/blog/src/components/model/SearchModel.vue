@@ -18,9 +18,9 @@
       <div class="search-result-wrapper">
         <hr class="divider" />
         <ul>
-          <li class="search-reslut" v-for="item of blogList" :key="item.id">
+          <li class="search-reslut" v-for="item of blogList" :key="item.blogId">
             <!-- 文章标题 -->
-            <a @click="goTo(item.id)" v-html="item.title" />
+            <a @click="goTo(item.blogId)" v-html="item.title" />
             <!-- 文章内容 -->
             <p
               class="search-reslut-content text-justify"

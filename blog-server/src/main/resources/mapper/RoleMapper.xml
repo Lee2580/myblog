@@ -21,7 +21,7 @@
     </resultMap>
 
     <resultMap id="RolePermissionMap" type="com.lee.blog.dto.ResourceRoleDTO">
-        <id column="id" property="id"/>
+        <id column="resource_id" property="resourceId"/>
         <result column="url" property="url"/>
         <result column="request_method" property="requestMethod"/>
         <collection property="roleList" ofType="java.lang.String">
