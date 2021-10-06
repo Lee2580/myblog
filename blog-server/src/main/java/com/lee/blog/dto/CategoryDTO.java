@@ -18,4 +18,9 @@ public class CategoryDTO {
      * 分类名
      */
     private String categoryName;
+
+    /**
+     * 分类下的博客数量
+     */
+    private Integer blogCount;
 }
