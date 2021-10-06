@@ -309,8 +309,8 @@ export default {
         this.userCount = data.data.userCount;
         this.blogCount = data.data.blogCount;
         this.blogStatisticsList = data.data.blogStatisticsList;
-        if (data.data.viewDTOList != null) {
-          data.data.viewDTOList.forEach(item => {
+        if (data.data.viewsDTOList != null) {
+          data.data.viewsDTOList.forEach(item => {
             this.viewCount.xAxis.data.push(item.day);
             this.viewCount.series[0].data.push(item.viewsCount);
           });
