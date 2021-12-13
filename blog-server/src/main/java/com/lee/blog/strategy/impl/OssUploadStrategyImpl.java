@@ -18,7 +18,7 @@ import java.io.InputStream;
  * @create 2021-09-21 21:07
  **/
 @Slf4j
-@Service
+@Service("ossUploadStrategyImpl")
 public class OssUploadStrategyImpl extends AbstractUploadStrategyImpl {
 
     @Autowired

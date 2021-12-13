@@ -1,26 +1,25 @@
 package com.lee.common.enums;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 /**
- * 上传策略枚举
+ * 搜索类型枚举类
  * @author lee
- * @create 2021-09-15 17:27
+ * @create 2021-12-13 17:18
  **/
-@AllArgsConstructor
 @Getter
-public enum UploadModeEnum {
+@AllArgsConstructor
+public enum SearchModeEnum {
 
     /**
-     * oss
+     * mysql
      */
-    OSS("oss", "ossUploadStrategyImpl"),
+    MYSQL("mysql", "mySqlSearchStrategyImpl"),
     /**
-     * 本地
+     * elasticsearch
      */
-    LOCAL("local", "localUploadStrategyImpl");
+    ELASTICSEARCH("elasticsearch", "elasticSearchStrategyImpl");
 
     /**
      * 模式
@@ -39,7 +38,7 @@ public enum UploadModeEnum {
      * @return {@link String} 搜索策略
      */
     public static String getStrategy(String mode) {
-        for (UploadModeEnum value : UploadModeEnum.values()) {
+        for (SearchModeEnum value : SearchModeEnum.values()) {
             if (value.getMode().equals(mode)) {
                 return value.getStrategy();
             }

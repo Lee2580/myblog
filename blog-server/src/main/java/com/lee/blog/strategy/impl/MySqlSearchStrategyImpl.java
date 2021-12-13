@@ -21,7 +21,7 @@ import static com.lee.common.enums.BlogStatusEnum.PUBLIC;
  * @author lee
  * @create 2021-09-18 19:04
  **/
-@Service
+@Service("mySqlSearchStrategyImpl")
 public class MySqlSearchStrategyImpl implements SearchStrategy {
 
     @Autowired

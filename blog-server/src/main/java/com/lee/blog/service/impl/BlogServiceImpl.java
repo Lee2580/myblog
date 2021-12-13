@@ -9,6 +9,7 @@ import com.lee.blog.entity.*;
 import com.lee.blog.mapper.*;
 import com.lee.blog.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lee.blog.strategy.SearchStrategyContext;
 import com.lee.blog.strategy.impl.MySqlSearchStrategyImpl;
 import com.lee.blog.util.BeanCopyUtil;
 import com.lee.blog.util.PageUtil;
@@ -78,8 +79,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Autowired
     HttpSession session;
 
+    //@Autowired
+    //MySqlSearchStrategyImpl mySqlSearchStrategy;
+
     @Autowired
-    MySqlSearchStrategyImpl mySqlSearchStrategy;
+    SearchStrategyContext searchStrategyContext;
 
     /**
      * 逻辑删除或恢复，修改删除状态
@@ -276,8 +280,10 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     @Override
     public List<BlogSearchDTO> listBlogBySearch(ConditionVo conditionVo) {
 
-        List<BlogSearchDTO> blogSearchDTOS = mySqlSearchStrategy.searchBlogs(conditionVo.getKeywords());
-        return blogSearchDTOS;
+        //List<BlogSearchDTO> blogSearchDTOS = mySqlSearchStrategy.searchBlogs(conditionVo.getKeywords());
+        //return blogSearchDTOS;
+
+        return searchStrategyContext.executeSearchStrategy(conditionVo.getKeywords());
     }
 
     /**
@@ -364,6 +370,18 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 .blogPreviewDTOList(blogPreviewDTOList)
                 .name(name)
                 .build();
+    }
+
+    /**
+     * 定期将阅读量点赞量数据写入mysql
+     */
+    @Override
+    public void redisBlogDataToMySql() {
+        // 查询博客点赞量和浏览量
+        Map<Object, Double> viewsCountMap = redisService.zAllScore(BLOG_VIEWS_COUNT);
+        Map<String, Object> likeCountMap = redisService.hGetAll(BLOG_LIKE_COUNT);
+        //TODO 写入mysql
+
     }
 
     /**

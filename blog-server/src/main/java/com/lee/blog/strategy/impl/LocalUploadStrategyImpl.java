@@ -11,7 +11,7 @@ import java.io.*;
  * @author lee
  * @create 2021-09-21 20:38
  **/
-@Service
+@Service("localUploadStrategyImpl")
 public class LocalUploadStrategyImpl extends AbstractUploadStrategyImpl {
 
     /**

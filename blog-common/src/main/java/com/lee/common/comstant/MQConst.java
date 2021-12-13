@@ -8,6 +8,16 @@ package com.lee.common.comstant;
 public class MQConst {
 
     /**
+     * maxwell交换机
+     */
+    public static final String MAXWELL_EXCHANGE = "maxwell_exchange";
+
+    /**
+     * maxwell队列
+     */
+    public static final String MAXWELL_QUEUE = "maxwell_queue";
+
+    /**
      * email交换机
      */
     public static final String EMAIL_EXCHANGE = "send";

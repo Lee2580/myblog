@@ -40,4 +40,6 @@ public interface BlogService extends IService<Blog> {
     PageResult<ArchiveDTO> listArchives();
 
     BlogPreviewListDTO listBlogByCondition(ConditionVo condition);
+
+    void redisBlogDataToMySql();
 }

@@ -1,6 +1,7 @@
 package com.lee.blog.controller;
 
 
+import com.lee.blog.service.BlogService;
 import com.lee.blog.service.ViewsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,15 @@ public class ViewsController {
     @Autowired
     ViewsService viewsService;
 
+    @Autowired
+    BlogService blogService;
+
     //"0 0 2 * * ?"
     @Scheduled(cron = "0 0 2 * * ?")
     public void redisDataToMySql(){
 
         viewsService.redisDataToMySql();
         //log.info("定时任务完成");
+        blogService.redisBlogDataToMySql();
     }
 }

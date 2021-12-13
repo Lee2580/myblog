@@ -112,7 +112,7 @@ class BlogServerApplicationTests {
     @Test
     void testWebp() throws IOException {
 
-        FileInputStream file =  new FileInputStream("E:\\图片\\commentBack.webp");
+        /*FileInputStream file =  new FileInputStream("");
         byte[] bytes = new byte[30];
 
         file.read(bytes,0,bytes.length);
@@ -120,7 +120,7 @@ class BlogServerApplicationTests {
         int width = ((int) bytes[27] & 0xff)<<8 | ((int) bytes[26] & 0xff);
         int height = ((int) bytes[29] & 0xff)<<8 | ((int) bytes[28] & 0xff);
         System.out.println(width);
-        System.out.println(height);
+        System.out.println(height);*/
     }
 
     @Test

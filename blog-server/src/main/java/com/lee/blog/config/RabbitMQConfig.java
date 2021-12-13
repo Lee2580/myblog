@@ -7,8 +7,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import static com.lee.common.comstant.MQConst.EMAIL_EXCHANGE;
-import static com.lee.common.comstant.MQConst.EMAIL_QUEUE;
+import static com.lee.common.comstant.MQConst.*;
 
 /**
  * Rabbitmq配置
@@ -18,21 +17,32 @@ import static com.lee.common.comstant.MQConst.EMAIL_QUEUE;
 @Configuration
 public class RabbitMQConfig {
 
-
-/*    @Bean
+    /**
+     * 博客队列
+     * @return
+     */
+    @Bean
     public Queue blogQueue() {
         return new Queue(MAXWELL_QUEUE, true);
     }
 
+    /**
+     * maxwell交换机
+     * @return
+     */
     @Bean
     public FanoutExchange maxWellExchange() {
         return new FanoutExchange(MAXWELL_EXCHANGE, true, false);
     }
 
+    /**
+     * 绑定器
+     * @return
+     */
     @Bean
-    public Binding bindingArticleDirect() {
+    public Binding bindingBlogDirect() {
         return BindingBuilder.bind(blogQueue()).to(maxWellExchange());
-    }*/
+    }
 
     /**
      * email队列
