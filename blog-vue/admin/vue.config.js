@@ -5,7 +5,7 @@ module.exports = {
     proxy: {
       "/api": {
         //代理地址，这里设置的地址会代替axios中设置的baseURL
-        target: "http://localhost:8080",
+        target: "http://localhost:9501",
         //是否跨域
         changeOrigin: true,
         //pathRewrite方法重写url
